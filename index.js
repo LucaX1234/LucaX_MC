@@ -1,5 +1,19 @@
 const tmi = require("tmi.js");
+const http = require("http");
 
+const PORT = process.env.PORT || 3000;
+
+// Kleiner Webserver für Render
+const server = http.createServer((req, res) => {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("LucaX_MC ist online! 🤖");
+});
+
+server.listen(PORT, () => {
+    console.log(`Webserver läuft auf Port ${PORT}`);
+});
+
+// Twitch-Bot
 const client = new tmi.Client({
     options: {
         debug: true
@@ -15,24 +29,37 @@ const client = new tmi.Client({
     ]
 });
 
-client.connect();
-
-client.on("connected", () => {
-    console.log("🤖 LucaX_MC ist mit Twitch verbunden!");
-});
+client.connect()
+    .then(() => {
+        console.log("🤖 LucaX_MC ist mit Twitch verbunden!");
+    })
+    .catch((error) => {
+        console.error("❌ Twitch-Verbindung fehlgeschlagen:", error);
+    });
 
 client.on("message", (channel, tags, message, self) => {
     if (self) return;
 
-    if (message.toLowerCase() === "!commands") {
-        client.say(channel, "🤖 Commands: !commands | !discord | !uptime");
+    const command = message.toLowerCase().trim();
+
+    if (command === "!commands") {
+        client.say(
+            channel,
+            "🤖 LucaX_MC Commands: !commands | !discord | !uptime"
+        );
     }
 
-    if (message.toLowerCase() === "!discord") {
-        client.say(channel, "💬 Discord: Dein Discord-Link kommt hier rein!");
+    if (command === "!discord") {
+        client.say(
+            channel,
+            "💬 Discord-Link kommt noch!"
+        );
     }
 
-    if (message.toLowerCase() === "!uptime") {
-        client.say(channel, "⏱️ Der Uptime-Command kommt als Nächstes!");
+    if (command === "!uptime") {
+        client.say(
+            channel,
+            "⏱️ LucaX_MC ist online!"
+        );
     }
 });
